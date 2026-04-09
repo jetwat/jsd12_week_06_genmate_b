@@ -1,56 +1,108 @@
 class Mother {
-    constructor(name, bloodGroup, give) {
-        this.name = name;
-        this.bloodGroup = bloodGroup;
-        this.give = give;
-        this._momBlood = "AB";
-        this._lastName = "Genmate B";
-        this._money = 20000000;
-    }
+  constructor(money) {
+    this._money = money;
+    this._momBlood = "AB";
+    this._lastName = "Genmate B";
+  }
 
-    getStatus() {
-        this._money -= this.give;
-        if (this._money < 0) return console.log("ติดหนี้!!");
-        if (this._money <= 10000000) return console.log("เงินเหลือครึ่งกระเป๋าแล้วนะ!!");
-        if (this._money < 20000000) return console.log("รวย!! พร้อมเปย์จ้า!!");
-        return console.log("มหาเศรษฐี...เงินฉันไม่มีหมด!!");
+
+
+  processWithdraw(amount) {
+    this._money -= amount;
+    this.displayStatus();
+  }
+
+
+
+  displayStatus() {
+    if (this._money < 0) {
+      console.log("แม่บอก: ติดหนี้แล้วลูกเอ๊ย!!");
+    } else if (this._money <= 10000000) {
+      console.log(`แม่บอก: เงินเหลือครึ่งกระเป๋าแล้วนะ!! (คงเหลือ: ${this._money.toLocaleString()} บาท)`);
+    } else {
+      console.log(`แม่บอก: รวย!! พร้อมเปย์จ้า!! (คงเหลือ: ${this._money.toLocaleString()} บาท)`);
     }
+  }
+
+  get currentMoney() {
+    return this._money;
+  }
 }
 
-class Child extends Mother {
-    constructor(name, bloodGroup, give, father) {  // :white_check_mark: #1,2
-        super(name, bloodGroup, give);             // :white_check_mark: #3
-        this.father = father;                      // :white_check_mark: #4
-        this.childList = [];
-    }
+class Child {
+  constructor(name, bloodGroup, amountToRequest, momInstance) {
+    this.name = name;
+    this.bloodGroup = bloodGroup;
+    this.give = amountToRequest;
+    this.mom = momInstance;
+  }
 
-    checkBlood() {
-        if (this.bloodGroup === this._momBlood) {  // :white_check_mark: #5
-            return `ฉัน ${this.name} เป็นลูกรักของแม่`;
-        }                                          // :white_check_mark: #6
-        return `ฉัน ${this.name} เป็นลูกใครหว่า !!!`;
-    }
 
-    addChild(child) {
-        this.childList.push(child);
-        console.log(`Added ${child.name} to mom's family`);
-    }
 
-    showAllChild() {
-        console.log(`--- Show all child ---`);
-        this.childList.forEach((child) => {        // :white_check_mark: #7, #8
-            console.log(`I'm ${child.name}`);
-            child.checkBlood();                    // :white_check_mark: #9
-            console.log(`----------------------`); // :white_check_mark: #10
-        });
+  requestMoney() {
+    console.log(`>> ${this.name} กำลังขอเบิกเงิน ${this.give.toLocaleString()} บาท...`);
+    this.mom.processWithdraw(this.give);
+  }
+
+  checkBlood() {
+    if (this.bloodGroup === this.mom._momBlood) {
+      console.log(`   [:heavy_check_mark:] ฉันชื่อ ${this.name} ลูกรักของแม่ (กรุ๊ปเลือดตรงกัน)`);
+    } else {
+      console.log(`   [!] ฉันชื่อ ${this.name} ลูกใครหว่า !!! (กรุ๊ปเลือดไม่ตรง)`);
     }
+  }
 }
 
-const waiwai = new Child("Waiwai", "AB", 10000000, "dad"); // :white_check_mark: #11
-const chong  = new Child("Chong",  "B",   5000000, "dad");
-const my     = new Child("My",     "O",         20, "dad");
+class Family {
+  constructor(familyName) {
+    this.familyName = familyName;
+    this.familyList = [];
+  }
+
+  addChild(child) {
+    this.familyList.push(child);
+    console.log(`เพิ่ม ${child.name} เข้าสู่ครอบครัว ${this.familyName} เรียบร้อย!`);
+  }
+
+  showAllAndSpend() {
+    console.log(`
+--------------------------------------------
+--- ยินดีต้อนรับสู่ครอบครัว ${this.familyName} ---
+--------------------------------------------`);
+
+    this.familyList.forEach((child) => {
+      child.checkBlood();
+      child.requestMoney();
+      console.log("--------------------------------------------");
+    });
+  }
+}
 
 
-// console.log(waiwai);
-waiwai.getStatus();
-// waiwai.checkBlood();
+
+
+
+
+
+const theMom = new Mother(20000000);
+
+
+
+const waiwai = new Child("Waiwai", "AB", 10000000, theMom);
+const chong = new Child("Chong", "B", 5000000, theMom);
+const my = new Child("My", "O", 20, theMom);
+
+
+
+const myFamily = new Family("เดอร์ รวย");
+myFamily.addChild(waiwai);
+myFamily.addChild(chong);
+myFamily.addChild(my);
+
+
+
+myFamily.showAllAndSpend();
+
+
+
+console.log(`สรุปยอดเงินสุดท้ายในกระเป๋าแม่: ${theMom.currentMoney.toLocaleString()} บาท`);
